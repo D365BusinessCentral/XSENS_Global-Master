@@ -4,7 +4,7 @@ pageextension 50201 ITGeneralLedgerSetup extends "General Ledger Setup"
     {
         addlast(content)
         {
-            group("Global Master Relication")
+            group("Global Master Replication")
             {
                 field("G/L Accounts"; Rec."G/L Accounts")
                 {
