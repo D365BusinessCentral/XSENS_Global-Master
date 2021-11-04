@@ -13,7 +13,11 @@ report 50202 "IT GM Replicate Dimensions"
             trigger OnAfterGetRecord()
             var
                 ReplicateData: Codeunit "IT GM Replicate Data";
+                GLSetup: Record "General Ledger Setup";
             begin
+                GLSetup.GET;
+                GLSetup.TestField(Dimensions, true);
+                GLSetup.TestField("Dimension Fields");
                 Clear(ReplicateData);
                 ReplicateData.SetData(Dimensions, Enum::"IT Data Replication Fn"::"Dimension Value");
                 ReplicateData.Run();

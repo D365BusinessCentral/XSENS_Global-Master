@@ -1537,11 +1537,11 @@ table 50216 "IT GM Outbox Handled Items"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(27000; "SAT Item Classification"; Code[10])
-        {
-            Caption = 'SAT Item Classification';
-            TableRelation = "SAT Classification";
-        }
+        // field(27000; "SAT Item Classification"; Code[10])
+        // {
+        //     Caption = 'SAT Item Classification';
+        //     TableRelation = "SAT Classification";
+        // }
 
         //************Fields from US & EU Instances***
         field(50200; "Estimated Sales Price"; Decimal)

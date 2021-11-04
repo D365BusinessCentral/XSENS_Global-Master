@@ -5,6 +5,7 @@ codeunit 50202 "IT GM Replicate Data"
     var
         DeafultDimension: Record "Default Dimension";
         DefaultDimensionOutbox: Record "IT GM Outbox Default Dimens.";
+        Sourcevariant, DestVariant : Variant;
     begin
         case FunctionType of
             FunctionType::"G/L Account":
@@ -12,10 +13,17 @@ codeunit 50202 "IT GM Replicate Data"
                     InsertIntoGMOutBox(RecGlAccount."No.", '');
                     Clear(RecGLOutbox);
                     RecGLOutbox.Init();
-                    RecGLOutbox.TransferFields(RecGlAccount);
+                    RecGLOutbox."No." := RecGlAccount."No.";
+                    RecGLOutbox.Insert();
+                    Sourcevariant := RecGlAccount;
+                    DestVariant := RecGLOutbox;
+                    InsertValuesByFieldNumber(Sourcevariant, DestVariant);
+                    RecGlAccount := Sourcevariant;
+                    RecGLOutbox := DestVariant;
+                    //RecGLOutbox.TransferFields(RecGlAccount);
                     RecGLOutbox."Source Type" := FunctionType;
                     RecGLOutbox."Outbox Entry No." := RecGMOutbox."Entry No.";
-                    RecGLOutbox.Insert(true);
+                    RecGLOutbox.Modify(true);
                     Clear(DeafultDimension);
                     DeafultDimension.SetRange("Table ID", Database::"G/L Account");
                     DeafultDimension.SetRange("No.", RecGlAccount."No.");
@@ -33,10 +41,17 @@ codeunit 50202 "IT GM Replicate Data"
                     InsertIntoGMOutBox(RecItem."No.", '');
                     Clear(RecItemOutbox);
                     RecItemOutbox.Init();
-                    RecItemOutbox.TransferFields(RecItem);
+                    RecItemOutbox."No." := RecItem."No.";
+                    RecItemOutbox.Insert();
+                    //RecItemOutbox.TransferFields(RecItem);
+                    Sourcevariant := RecItem;
+                    DestVariant := RecItemOutbox;
+                    InsertValuesByFieldNumber(Sourcevariant, DestVariant);
+                    RecItem := Sourcevariant;
+                    RecItemOutbox := DestVariant;
                     RecItemOutbox."Source Type" := FunctionType;
                     RecItemOutbox."Outbox Entry No." := RecGMOutbox."Entry No.";
-                    RecItemOutbox.Insert(true);
+                    RecItemOutbox.Modify(true);
                     Clear(DeafultDimension);
                     DeafultDimension.SetRange("Table ID", Database::Item);
                     DeafultDimension.SetRange("No.", RecItem."No.");
@@ -54,10 +69,18 @@ codeunit 50202 "IT GM Replicate Data"
                     InsertIntoGMOutBox(RecDimensionValue.Code, RecDimensionValue."Dimension Code");
                     Clear(RecDimensionOutbox);
                     RecDimensionOutbox.Init();
-                    RecDimensionOutbox.TransferFields(RecDimensionValue);
+                    RecDimensionOutbox."Dimension Code" := RecDimensionValue."Dimension Code";
+                    RecDimensionOutbox.Code := RecDimensionValue.Code;
+                    RecDimensionOutbox.Insert();
+                    Sourcevariant := RecDimensionValue;
+                    DestVariant := RecDimensionOutbox;
+                    InsertValuesByFieldNumber(Sourcevariant, DestVariant);
+                    RecDimensionValue := Sourcevariant;
+                    RecDimensionOutbox := DestVariant;
+                    //RecDimensionOutbox.TransferFields(RecDimensionValue);
                     RecDimensionOutbox."Source Type" := FunctionType;
                     RecDimensionOutbox."Outbox Entry No." := RecGMOutbox."Entry No.";
-                    RecDimensionOutbox.Insert(true);
+                    RecDimensionOutbox.Modify(true);
                 end;
         end;
     end;
@@ -348,6 +371,75 @@ codeunit 50202 "IT GM Replicate Data"
             FunctionType::"Dimension Value":
                 RecDimensionValue := RecVariant;
         end;
+    end;
+
+    local procedure InsertValuesByFieldNumber(var SourceVariant: Variant; Var DestVariant: Variant)
+    var
+        RecGLAccountL: Record "G/L Account";
+        RecItemL: Record Item;
+        RecDimensionL: Record "Dimension Value";
+        RecGLOutboxL: Record "IT GM Outbox G/L Account";
+        RecItemOutboxL: Record "IT GM Outbox Items";
+        RecDimensionOutbox: Record "IT GM Outbox Dimension Value";
+        GLSetupL: Record "General Ledger Setup";
+        FieldList: List of [Text];
+        Seperators: Text;
+        Text: Text;
+        FieldNumber: Integer;
+        FRef: FieldRef;
+        Fref2: FieldRef;
+        SourceRecRef: RecordRef;
+        DestinationRecordRef: RecordRef;
+    begin
+        SourceRecRef.GetTable(SourceVariant);
+        DestinationRecordRef.GetTable(DestVariant);
+        GLSetupL.GET;
+        CASE SourceRecRef.NUMBER OF
+            DATABASE::"G/L Account":
+                BEGIN
+                    if GLSetupL."G/L Account Fields" <> '' then begin
+                        Seperators := ',';
+                        FieldList := GLSetupL."G/L Account Fields".Split(Seperators.Split());
+                        foreach Text in FieldList do begin
+                            Evaluate(FieldNumber, Text);
+                            FRef := SourceRecRef.FIELD(FieldNumber);
+                            Fref2 := DestinationRecordRef.Field(FieldNumber);
+                            Fref2.Value(FRef.Value);
+                            DestinationRecordRef.Modify();
+                        end;
+                    end;
+                END;
+            DATABASE::Item:
+                BEGIN
+                    if GLSetupL."Item Fields" <> '' then begin
+                        Seperators := ',';
+                        FieldList := GLSetupL."Item Fields".Split(Seperators.Split());
+                        foreach Text in FieldList do begin
+                            Evaluate(FieldNumber, Text);
+                            FRef := SourceRecRef.FIELD(FieldNumber);
+                            Fref2 := DestinationRecordRef.Field(FieldNumber);
+                            Fref2.Value(FRef.Value);
+                            DestinationRecordRef.Modify();
+                        end;
+                    end;
+                END;
+            DATABASE::"Dimension Value":
+                BEGIN
+                    if GLSetupL."Dimension Fields" <> '' then begin
+                        Seperators := ',';
+                        FieldList := GLSetupL."Dimension Fields".Split(Seperators.Split());
+                        foreach Text in FieldList do begin
+                            Evaluate(FieldNumber, Text);
+                            FRef := SourceRecRef.FIELD(FieldNumber);
+                            Fref2 := DestinationRecordRef.Field(FieldNumber);
+                            Fref2.Value(FRef.Value);
+                            DestinationRecordRef.Modify();
+                        end;
+                    end;
+                END;
+        end;
+        SourceVariant := SourceRecRef;
+        DestVariant := DestinationRecordRef;
     end;
 
     var

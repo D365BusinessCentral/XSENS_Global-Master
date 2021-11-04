@@ -169,9 +169,9 @@ xmlport 50200 "IT GM Outbox Export"
                         fieldelement(ReconciliationAccount; GLAccount."Reconciliation Account")
                         {
                         }
-                        fieldelement(SATAccountCode; GLAccount."SAT Account Code")
-                        {
-                        }
+                        // fieldelement(SATAccountCode; GLAccount."SAT Account Code")
+                        // {
+                        // }
                         fieldelement(SearchName; GLAccount."Search Name")
                         {
                         }
@@ -748,9 +748,9 @@ xmlport 50200 "IT GM Outbox Export"
                         fieldelement(RoutingNo; Items."Routing No.")
                         {
                         }
-                        fieldelement(SATItemClassification; Items."SAT Item Classification")
-                        {
-                        }
+                        // fieldelement(SATItemClassification; Items."SAT Item Classification")
+                        // {
+                        // }
                         fieldelement(SafetyLeadTime; Items."Safety Lead Time")
                         {
                         }

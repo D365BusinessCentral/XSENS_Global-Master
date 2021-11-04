@@ -13,7 +13,11 @@ report 50200 "IT GM Replicate GL Account"
             trigger OnAfterGetRecord()
             var
                 ReplicateData: Codeunit "IT GM Replicate Data";
+                GLSetup: Record "General Ledger Setup";
             begin
+                GLSetup.GET;
+                GLSetup.TestField("G/L Accounts", true);
+                GLSetup.TestField("G/L Account Fields");
                 Clear(ReplicateData);
                 ReplicateData.SetData(GLAccount, Enum::"IT Data Replication Fn"::"G/L Account");
                 ReplicateData.Run();

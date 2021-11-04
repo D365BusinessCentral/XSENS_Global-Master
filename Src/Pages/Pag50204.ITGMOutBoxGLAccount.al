@@ -196,11 +196,11 @@ page 50204 "IT GM Outbox G/L Account"
                     ToolTip = 'Specifies the value of the Exchange Rate Adjustment field';
                     ApplicationArea = All;
                 }
-                field("GIFI Code"; Rec."GIFI Code")
-                {
-                    ToolTip = 'Specifies the value of the GIFI Code field';
-                    ApplicationArea = All;
-                }
+                // field("GIFI Code"; Rec."GIFI Code")
+                // {
+                //     ToolTip = 'Specifies the value of the GIFI Code field';
+                //     ApplicationArea = All;
+                // }
                 field("Gen. Bus. Posting Group"; Rec."Gen. Bus. Posting Group")
                 {
                     ToolTip = 'Specifies the value of the Gen. Bus. Posting Group field';
@@ -286,11 +286,11 @@ page 50204 "IT GM Outbox G/L Account"
                     ToolTip = 'Specifies the value of the Reconciliation Account field';
                     ApplicationArea = All;
                 }
-                field("SAT Account Code"; Rec."SAT Account Code")
-                {
-                    ToolTip = 'Specifies the value of the SAT Account Code field';
-                    ApplicationArea = All;
-                }
+                // field("SAT Account Code"; Rec."SAT Account Code")
+                // {
+                //     ToolTip = 'Specifies the value of the SAT Account Code field';
+                //     ApplicationArea = All;
+                // }
                 field("Search Name"; Rec."Search Name")
                 {
                     ToolTip = 'Specifies the value of the Search Name field';

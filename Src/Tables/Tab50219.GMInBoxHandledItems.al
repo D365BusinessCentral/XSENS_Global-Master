@@ -1572,12 +1572,12 @@ table 50219 "IT GM Inbox Handled Items"
             Editable = false;
             FieldClass = FlowField;
         }
-        field(27000; "SAT Item Classification"; Code[10])
-        {
-            Caption = 'SAT Item Classification';
-            TableRelation = "SAT Classification";
-            ValidateTableRelation = false;
-        }
+        // field(27000; "SAT Item Classification"; Code[10])
+        // {
+        //     Caption = 'SAT Item Classification';
+        //     TableRelation = "SAT Classification";
+        //     ValidateTableRelation = false;
+        // }
 
         //************Fields from US & EU Instances***
         field(50200; "Estimated Sales Price"; Decimal)

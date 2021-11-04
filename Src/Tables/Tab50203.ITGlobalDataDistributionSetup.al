@@ -28,7 +28,7 @@ table 50203 "IT GM Data Distribution Setup"
         {
             DataClassification = ToBeClassified;
 
-            TableRelation = IF ("Destination Entity Type" = CONST("Same Instance")) Company;
+            TableRelation = Company;//IF ("Destination Entity Type" = CONST("Same Instance")) Company;
             trigger OnValidate()
             begin
                 if "Destination Entity" = "Source Entity" then

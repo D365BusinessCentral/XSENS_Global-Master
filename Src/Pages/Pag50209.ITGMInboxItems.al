@@ -759,11 +759,11 @@ page 50209 "IT GM Inbox Items"
                     ApplicationArea = All;
                 }
 
-                field("SAT Item Classification"; Rec."SAT Item Classification")
-                {
-                    ToolTip = 'Specifies the value of the SAT Item Classification field';
-                    ApplicationArea = All;
-                }
+                // field("SAT Item Classification"; Rec."SAT Item Classification")
+                // {
+                //     ToolTip = 'Specifies the value of the SAT Item Classification field';
+                //     ApplicationArea = All;
+                // }
                 field("Safety Lead Time"; Rec."Safety Lead Time")
                 {
                     ToolTip = 'Specifies the value of the Safety Lead Time field';

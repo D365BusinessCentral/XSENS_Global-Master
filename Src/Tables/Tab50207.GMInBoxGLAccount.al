@@ -489,18 +489,18 @@ table 50207 "IT GM Inbox G/L Account"
             Caption = 'API Account Type';
             Editable = false;
         }
-        field(10001; "GIFI Code"; Code[10])
-        {
-            Caption = 'GIFI Code';
-            TableRelation = "GIFI Code";
-            ValidateTableRelation = false;
-        }
-        field(27000; "SAT Account Code"; Code[20])
-        {
-            Caption = 'SAT Account Code';
-            TableRelation = "SAT Account Code";
-            ValidateTableRelation = false;
-        }
+        // field(10001; "GIFI Code"; Code[10])
+        // {
+        //     Caption = 'GIFI Code';
+        //     TableRelation = "GIFI Code";
+        //     ValidateTableRelation = false;
+        // }
+        // field(27000; "SAT Account Code"; Code[20])
+        // {
+        //     Caption = 'SAT Account Code';
+        //     TableRelation = "SAT Account Code";
+        //     ValidateTableRelation = false;
+        // }
         field(50205; "Source Type"; Enum "IT Data Replication Fn")
         {
             Caption = 'Source Type';
@@ -560,9 +560,9 @@ table 50207 "IT GM Inbox G/L Account"
         key(Key9; "Account Type")
         {
         }
-        key(Key10; "GIFI Code")
-        {
-        }
+        // key(Key10; "GIFI Code")
+        // {
+        // }
         key(Key11; "Account Category")
         {
         }
