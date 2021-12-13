@@ -8,7 +8,7 @@ pageextension 50204 Items extends "Item List"
             {
                 ApplicationArea = All;
                 Image = "Invoicing-Send";
-                PromotedCategory=Process;
+                PromotedCategory = Process;
                 Promoted = true;
                 PromotedOnly = true;
                 trigger OnAction()
@@ -22,8 +22,7 @@ pageextension 50204 Items extends "Item List"
                         Clear(ReplicateItems);
                         ReplicateItems.SetTableView(RecItem);
                         ReplicateItems.Run();
-                        Rec.Replicated := true;
-                        Rec.Modify();
+                        RecItem.ModifyAll(Replicated, true);
                     end;
                 end;
             }

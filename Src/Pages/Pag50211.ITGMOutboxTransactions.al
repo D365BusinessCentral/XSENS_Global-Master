@@ -101,8 +101,16 @@ page 50211 "IT GM Outbox Transactions"
                 trigger OnAction()
                 var
                     ReplicateData: Codeunit "IT GM Replicate Data";
+                    RecOutbox: Record "IT GM Outbox Transactions";
                 begin
-                    ReplicateData.MoveToInbox(Rec);
+                    Clear(RecOutbox);
+                    CurrPage.SetSelectionFilter(RecOutbox);
+                    if RecOutbox.FindSet() then begin
+                        repeat
+                            ReplicateData.MoveToInbox(RecOutbox);
+                        until RecOutbox.Next() = 0;
+                    end
+
                 end;
             }
         }

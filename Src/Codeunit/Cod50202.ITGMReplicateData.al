@@ -310,7 +310,7 @@ codeunit 50202 "IT GM Replicate Data"
         end;
     end;
 
-    local procedure SendDataToAzureBlobStorage(RecOutbox: Record "IT GM Outbox Transactions")
+    local procedure SendDataToAzureBlobStorage(var RecOutbox: Record "IT GM Outbox Transactions")
     var
         ExportOutboxData: XmlPort "IT GM Outbox Export";
         TempBlob: Codeunit "Temp Blob";
@@ -328,7 +328,7 @@ codeunit 50202 "IT GM Replicate Data"
         TempBlob.CreateInStream(Instream);
         RecCompanyInfo.GET;
         RecCompanyInfo.TestField("Root Container GM");
-        FileName := RecOutbox."Source Entity" + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '_' + CompanyName + '.xml';
+        FileName := RecOutbox."Source Entity" + '_' + FORMAT(RecOutbox."Source Type") + '_' + RecOutbox."Document No." + '_' + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '.xml';
         BlobService.PutBlob(RecCompanyInfo."Root Container GM", FileName, Instream);
     end;
 

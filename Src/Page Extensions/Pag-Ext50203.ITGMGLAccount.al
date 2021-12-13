@@ -22,8 +22,7 @@ pageextension 50203 "IT GM G/L Account" extends "Chart of Accounts"
                         Clear(ReplicateGl);
                         ReplicateGl.SetTableView(RecGL);
                         ReplicateGl.Run();
-                        Rec.Replicated := true;
-                        Rec.Modify();
+                        RecGL.ModifyAll(Replicated, true);
                     end;
                 end;
             }

@@ -115,14 +115,23 @@ page 50210 "IT GM Inbox Transaction"
                 trigger OnAction()
                 var
                     ReplicateData: Codeunit "IT GM InsertFromInbox";
+                    RecInboxTransaction: Record "IT GM Inbox Transactions";
                 begin
-                    ClearLastError();
-                    if ReplicateData.Run(Rec) then begin
-                        ReplicateData.MoveToHandledInbox(Rec);
-                    end else begin
-                        Rec."Error Remarks" := GetLastErrorText();
-                        Rec.Modify();
-                    end;
+                    Clear(RecInboxTransaction);
+                    CurrPage.SetSelectionFilter(RecInboxTransaction);
+                    if RecInboxTransaction.FindSet() then begin
+                        repeat
+                            Commit();
+                            ClearLastError();
+                            if ReplicateData.Run(RecInboxTransaction) then begin
+                                ReplicateData.MoveToHandledInbox(RecInboxTransaction);
+                            end else begin
+                                RecInboxTransaction."Error Remarks" := GetLastErrorText();
+                                RecInboxTransaction.Modify();
+                            end;
+                        until RecInboxTransaction.Next() = 0;
+                    end
+
                 end;
             }
         }

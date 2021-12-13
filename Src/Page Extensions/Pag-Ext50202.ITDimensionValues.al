@@ -36,8 +36,7 @@ pageextension 50202 ITDimensionValues extends "Dimension Values"
                         Clear(ReplicateDimensions);
                         ReplicateDimensions.SetTableView(RecDimensionValue);
                         ReplicateDimensions.Run();
-                        Rec.Replicated := true;
-                        Rec.Modify();
+                        RecDimensionValue.ModifyAll(Replicated, true);
                     end;
                 end;
             }
