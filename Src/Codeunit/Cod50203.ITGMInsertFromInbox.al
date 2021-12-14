@@ -208,6 +208,30 @@ codeunit 50203 "IT GM InsertFromInbox"
         RecInbox.Delete();
     end;
 
+    local procedure ValidateGLAccountFields(var RecGLAccountP: record "G/L Account"; Var RecInboxGLP: Record "IT GM Inbox G/L Account")
+    begin
+
+    end;
+
+    local procedure ValidateItemFields(Var RecItemP: Record Item; Var RecItemInboxP: Record "IT GM Inbox Items")
+    begin
+
+    end;
+
+    local procedure ValidateDimensionFields(var RecDimensionvalueP: record "Dimension Value"; var RecDimensionInbox: Record "IT GM Inbox Dimension Value")
+    begin
+        RecDimensionvalueP.Validate(Name, RecDimensionInbox.Name);
+        RecDimensionvalueP.Validate("Dimension Value Type", RecDimensionInbox."Dimension Value Type");
+        RecDimensionvalueP.Validate(Totaling, RecDimensionInbox.Totaling);
+        RecDimensionvalueP.Validate(Blocked, RecDimensionInbox.Blocked);
+        RecDimensionvalueP.Validate("Consolidation Code", RecDimensionInbox."Consolidation Code");
+        RecDimensionvalueP.Validate("Global Dimension No.", RecDimensionInbox."Global Dimension No.");
+        RecDimensionvalueP.Validate("Dimension Id", RecDimensionInbox."Dimension Id");
+        RecDimensionvalueP.Validate("Map-to IC Dimension Code", RecDimensionInbox."Map-to IC Dimension Code");
+        RecDimensionvalueP.Validate("Map-to IC Dimension Value Code", RecDimensionInbox."Map-to IC Dimension Value Code");
+        RecDimensionvalueP.Validate(Indentation, RecDimensionInbox.Indentation);
+    end;
+
     var
         RecDimensionInbox: Record "IT GM Inbox Dimension Value";
         RecItemInbox: Record "IT GM Inbox Items";
