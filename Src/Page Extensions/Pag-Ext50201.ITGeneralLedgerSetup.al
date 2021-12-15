@@ -43,7 +43,7 @@ pageextension 50201 ITGeneralLedgerSetup extends "General Ledger Setup"
                                 repeat
                                     TextBuilder.Append(FORMAT(RecFieldList."No.") + ',');
                                 until RecFieldList.Next() = 0;
-                                if TextBuilder.Length <= 300 then
+                                if TextBuilder.Length <= 1000 then
                                     Rec."G/L Account Fields" := CopyStr(TextBuilder.ToText(), 1, TextBuilder.Length - 1)
                                 else
                                     Rec."G/L Account Fields" := 'length Exceeded';
@@ -76,7 +76,7 @@ pageextension 50201 ITGeneralLedgerSetup extends "General Ledger Setup"
                                 repeat
                                     TextBuilder.Append(FORMAT(RecFieldList."No.") + ',');
                                 until RecFieldList.Next() = 0;
-                                if TextBuilder.Length <= 300 then
+                                if TextBuilder.Length <= 500 then
                                     Rec."Dimension Fields" := CopyStr(TextBuilder.ToText(), 1, TextBuilder.Length - 1)
                                 else
                                     Rec."Dimension Fields" := 'length Exceeded';
@@ -109,7 +109,7 @@ pageextension 50201 ITGeneralLedgerSetup extends "General Ledger Setup"
                                 repeat
                                     TextBuilder.Append(FORMAT(RecFieldList."No.") + ',');
                                 until RecFieldList.Next() = 0;
-                                if TextBuilder.Length <= 300 then
+                                if TextBuilder.Length <= 2000 then
                                     Rec."Item Fields" := CopyStr(TextBuilder.ToText(), 1, TextBuilder.Length - 1)
                                 else
                                     Rec."Item Fields" := 'length Exceeded';

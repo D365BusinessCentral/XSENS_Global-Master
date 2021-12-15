@@ -127,8 +127,10 @@ codeunit 50202 "IT GM Replicate Data"
         RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
         RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Different Instance");
         if RecDataDistributionSetup.FindSet() then begin
-            IsDistributionSetupAvailable := true;
-            SendDataToAzureBlobStorage(RecOutbox);
+            repeat
+                IsDistributionSetupAvailable := true;
+                SendDataToAzureBlobStorage(RecOutbox, RecDataDistributionSetup."Destination Entity");
+            until RecDataDistributionSetup.Next() = 0;
         end;
 
         if not IsDistributionSetupAvailable then
@@ -310,25 +312,29 @@ codeunit 50202 "IT GM Replicate Data"
         end;
     end;
 
-    local procedure SendDataToAzureBlobStorage(var RecOutbox: Record "IT GM Outbox Transactions")
+    local procedure SendDataToAzureBlobStorage(var RecOutbox: Record "IT GM Outbox Transactions"; EntityName: Text[30])
     var
         ExportOutboxData: XmlPort "IT GM Outbox Export";
         TempBlob: Codeunit "Temp Blob";
         RecCompanyInfo: Record "Company Information";
+        RecOutboxLocal: Record "IT GM Outbox Transactions";
         BlobService: Codeunit "Blob Service API GM";
         FileName: Text;
         OutStream: OutStream;
         InStream: InStream;
     begin
+        Clear(RecOutboxLocal);
+        RecOutboxLocal.SetRange("Entry No.", RecOutbox."Entry No.");
+        RecOutboxLocal.FindFirst();
         Clear(ExportOutboxData);
-        ExportOutboxData.SetTableView(RecOutbox);
+        ExportOutboxData.SetTableView(RecOutboxLocal);
         TempBlob.CreateOutStream(OutStream);
         ExportOutboxData.SetDestination(OutStream);
         ExportOutboxData.Export();
         TempBlob.CreateInStream(Instream);
         RecCompanyInfo.GET;
         RecCompanyInfo.TestField("Root Container GM");
-        FileName := RecOutbox."Source Entity" + '_' + FORMAT(RecOutbox."Source Type") + '_' + RecOutbox."Document No." + '_' + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '.xml';
+        FileName := RecOutboxLocal."Source Entity" + '_' + EntityName + '_' + FORMAT(RecOutboxLocal."Source Type") + '_' + RecOutboxLocal."Document No." + '_' + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '.xml';
         BlobService.PutBlob(RecCompanyInfo."Root Container GM", FileName, Instream);
     end;
 
