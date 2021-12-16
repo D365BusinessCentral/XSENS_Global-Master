@@ -248,6 +248,8 @@ codeunit 50202 "IT GM Replicate Data"
                     RecGLInbox.ChangeCompany(EntityName);
                     RecGLInbox.Init();
                     RecGLInbox.TransferFields(RecGLOutbox);
+                    RecGLOutbox.CalcFields("Account Subcategory Descript.");
+                    RecGLInbox."Account Subcategory Descript." := RecGLOutbox."Account Subcategory Descript.";
                     RecGLInbox."Entry No." := 0;
                     RecGLInbox."Inbox Entry No." := RecGMInbox."Entry No.";
                     RecGLInbox.Insert(true);

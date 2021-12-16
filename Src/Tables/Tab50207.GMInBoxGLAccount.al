@@ -461,10 +461,10 @@ table 50207 "IT GM Inbox G/L Account"
         }
         field(81; "Account Subcategory Descript."; Text[80])
         {
-            CalcFormula = Lookup("G/L Account Category".Description WHERE("Entry No." = FIELD("Account Subcategory Entry No.")));
+            //CalcFormula = Lookup("G/L Account Category".Description WHERE("Entry No." = FIELD("Account Subcategory Entry No.")));
             Caption = 'Account Subcategory Descript.';
             Editable = false;
-            FieldClass = FlowField;
+            //FieldClass = FlowField;
         }
         field(400; "Dimension Set ID Filter"; Integer)
         {

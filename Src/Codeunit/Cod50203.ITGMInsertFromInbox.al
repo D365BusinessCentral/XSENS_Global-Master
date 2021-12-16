@@ -220,6 +220,8 @@ codeunit 50203 "IT GM InsertFromInbox"
     end;
 
     local procedure ValidateGLAccountFields(var RecGLAccountP: record "G/L Account"; Var RecInboxGLP: Record "IT GM Inbox G/L Account")
+    var
+        RecGLCategory: Record "G/L Account Category";
     begin
         RecGLAccountP.Validate(Name, RecInboxGLP.Name);
         RecGLAccountP.Validate("Search Name", RecInboxGLP."Search Name");
@@ -276,7 +278,11 @@ codeunit 50203 "IT GM InsertFromInbox"
         //RecGLAccountP.Validate("Add.-Currency Credit Amount", RecInboxGLP."Add.-Currency Credit Amount");
         RecGLAccountP.Validate("Default IC Partner G/L Acc. No", RecInboxGLP."Default IC Partner G/L Acc. No");
         RecGLAccountP.Validate("Omit Default Descr. in Jnl.", RecInboxGLP."Omit Default Descr. in Jnl.");
-        RecGLAccountP.Validate("Account Subcategory Entry No.", RecInboxGLP."Account Subcategory Entry No.");
+        Clear(RecGLCategory);
+        RecGLCategory.SetRange(Description, RecInboxGLP."Account Subcategory Descript.");
+        if RecGLCategory.FindFirst() then
+            RecGLAccountP.Validate("Account Subcategory Entry No.", RecGLCategory."Entry No.");
+        // RecGLAccountP.Validate("Account Subcategory Entry No.", RecInboxGLP."Account Subcategory Entry No.");
         //RecGLAccountP.Validate("Account Subcategory Descript.", RecInboxGLP."Account Subcategory Descript.");
         RecGLAccountP.Validate("Dimension Set ID Filter", RecInboxGLP."Dimension Set ID Filter");
         RecGLAccountP.Validate("Cost Type No.", RecInboxGLP."Cost Type No.");
