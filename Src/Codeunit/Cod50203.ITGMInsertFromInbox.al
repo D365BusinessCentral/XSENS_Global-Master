@@ -302,7 +302,8 @@ codeunit 50203 "IT GM InsertFromInbox"
         //RecItemP.Validate("Assembly BOM", RecItemInboxP."Assembly BOM");
         RecItemP.Validate("Price Unit Conversion", RecItemInboxP."Price Unit Conversion");
         RecItemP.Validate(Type, RecItemInboxP.Type);
-        //RecItemP.Validate("Inventory Posting Group", RecItemInboxP."Inventory Posting Group");
+        if RecItemP.Type = RecItemP.Type::Inventory then
+            RecItemP.Validate("Inventory Posting Group", RecItemInboxP."Inventory Posting Group");
         RecItemP.Validate("Shelf No.", RecItemInboxP."Shelf No.");
         RecItemP.Validate("Item Disc. Group", RecItemInboxP."Item Disc. Group");
         RecItemP.Validate("Allow Invoice Disc.", RecItemInboxP."Allow Invoice Disc.");
