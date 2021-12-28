@@ -100,7 +100,7 @@ codeunit 50202 "IT GM Replicate Data"
         RecGMOutbox.Modify(true);
     end;
 
-    procedure MoveToInbox(Var RecOutbox: Record "IT GM Outbox Transactions")
+    procedure MoveToInbox(Var RecOutbox: Record "IT GM Outbox Transactions"; MoveOnlyOnSameInstance: Boolean)
     var
         RecHandledOutbox: Record "IT GM Outbox Handled Trans.";
         RecGLOutboxHandled: Record "IT GM Outbox Handled G/L Acc.";
@@ -122,17 +122,20 @@ codeunit 50202 "IT GM Replicate Data"
             until RecDataDistributionSetup.Next() = 0;
         end;
 
-        Clear(RecDataDistributionSetup);
-        RecDataDistributionSetup.SetRange("Table Name", RecOutbox."Source Type");
-        RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
-        RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Different Instance");
-        if RecDataDistributionSetup.FindSet() then begin
-            repeat
-                IsDistributionSetupAvailable := true;
-                SendDataToAzureBlobStorage(RecOutbox, RecDataDistributionSetup."Destination Entity");
-            until RecDataDistributionSetup.Next() = 0;
+        if not MoveOnlyOnSameInstance then begin
+            Clear(RecDataDistributionSetup);
+            RecDataDistributionSetup.SetRange("Table Name", RecOutbox."Source Type");
+            RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
+            RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Different Instance");
+            if RecDataDistributionSetup.FindSet() then begin
+                repeat
+                    IsDistributionSetupAvailable := true;
+                    SendDataToAzureBlobStorage(RecOutbox, RecDataDistributionSetup."Destination Entity");
+                until RecDataDistributionSetup.Next() = 0;
+            end;
         end;
-
+        if MoveOnlyOnSameInstance AND IsDistributionSetupAvailable = false then
+            exit;
         if not IsDistributionSetupAvailable then
             Error('Data Distribution Setup is not available');
 

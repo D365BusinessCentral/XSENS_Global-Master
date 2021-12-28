@@ -130,8 +130,7 @@ page 50210 "IT GM Inbox Transaction"
                                 RecInboxTransaction.Modify();
                             end;
                         until RecInboxTransaction.Next() = 0;
-                    end
-
+                    end;
                 end;
             }
         }
