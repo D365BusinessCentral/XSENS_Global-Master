@@ -32,6 +32,7 @@ codeunit 50202 "IT GM Replicate Data"
                             DefaultDimensionOutbox.Init();
                             DefaultDimensionOutbox.TransferFields(DeafultDimension);
                             DefaultDimensionOutbox."Outbox Entry No." := RecGMOutbox."Entry No.";
+                            DefaultDimensionOutbox."Entry No." := 0;
                             DefaultDimensionOutbox.Insert();
                         until DeafultDimension.Next() = 0;
                     end;
@@ -60,6 +61,7 @@ codeunit 50202 "IT GM Replicate Data"
                             DefaultDimensionOutbox.Init();
                             DefaultDimensionOutbox.TransferFields(DeafultDimension);
                             DefaultDimensionOutbox."Outbox Entry No." := RecGMOutbox."Entry No.";
+                            DefaultDimensionOutbox."Entry No." := 0;
                             DefaultDimensionOutbox.Insert();
                         until DeafultDimension.Next() = 0;
                     end;
@@ -134,7 +136,7 @@ codeunit 50202 "IT GM Replicate Data"
                 until RecDataDistributionSetup.Next() = 0;
             end;
         end;
-        if MoveOnlyOnSameInstance AND IsDistributionSetupAvailable = false then
+        if (MoveOnlyOnSameInstance) AND (IsDistributionSetupAvailable = false) then
             exit;
         if not IsDistributionSetupAvailable then
             Error('Data Distribution Setup is not available');
@@ -267,6 +269,7 @@ codeunit 50202 "IT GM Replicate Data"
                             DefaultDimensionInbox.Init();
                             DefaultDimensionInbox.TransferFields(DefaultDimensionOutbox);
                             DefaultDimensionInbox."Inbox Entry No." := RecGMInbox."Entry No.";
+                            DefaultDimensionInbox."Entry No." := 0;
                             DefaultDimensionInbox.Insert();
                         until DefaultDimensionOutbox.Next() = 0;
                     end;
@@ -295,6 +298,7 @@ codeunit 50202 "IT GM Replicate Data"
                             DefaultDimensionInbox.Init();
                             DefaultDimensionInbox.TransferFields(DefaultDimensionOutbox);
                             DefaultDimensionInbox."Inbox Entry No." := RecGMInbox."Entry No.";
+                            DefaultDimensionInbox."Entry No." := 0;
                             DefaultDimensionInbox.Insert();
                         until DefaultDimensionOutbox.Next() = 0;
                     end;
