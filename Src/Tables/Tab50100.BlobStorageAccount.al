@@ -1,6 +1,7 @@
 table 50200 "IT Blob Storage Account"
 {
     DataClassification = ToBeClassified;
+    DataPerCompany = false;
 
     fields
     {
@@ -23,6 +24,21 @@ table 50200 "IT Blob Storage Account"
         {
             DataClassification = CustomerContent;
             ExtendedDatatype = Masked;
+        }
+        field(5; "Root Container GM"; Text[250])
+        {
+            DataClassification = ToBeClassified;
+            TableRelation = "IT Blob Storage Containers";
+        }
+        field(6; "Success Container GM"; Text[250])
+        {
+            DataClassification = ToBeClassified;
+            TableRelation = "IT Blob Storage Containers";
+        }
+        field(7; "Failed Container GM"; Text[250])
+        {
+            DataClassification = ToBeClassified;
+            TableRelation = "IT Blob Storage Containers";
         }
     }
 

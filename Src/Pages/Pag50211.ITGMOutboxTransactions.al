@@ -106,9 +106,9 @@ page 50211 "IT GM Outbox Transactions"
                     Clear(RecOutbox);
                     CurrPage.SetSelectionFilter(RecOutbox);
                     if RecOutbox.FindSet() then begin
-                        repeat
-                            ReplicateData.MoveToInbox(RecOutbox, false);
-                        until RecOutbox.Next() = 0;
+                        //repeat
+                        ReplicateData.MoveToInbox(RecOutbox);
+                        //until RecOutbox.Next() = 0;
                     end;
                 end;
             }

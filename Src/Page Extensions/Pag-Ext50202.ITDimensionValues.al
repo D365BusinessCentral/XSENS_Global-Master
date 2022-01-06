@@ -33,6 +33,7 @@ pageextension 50202 ITDimensionValues extends "Dimension Values"
                     Clear(RecDimensionValue);
                     CurrPage.SetSelectionFilter(RecDimensionValue);
                     if RecDimensionValue.FindSet() then begin
+                        ValidateDimension(RecDimensionValue);
                         Clear(ReplicateDimensions);
                         ReplicateDimensions.SetTableView(RecDimensionValue);
                         ReplicateDimensions.Run();
@@ -42,4 +43,13 @@ pageextension 50202 ITDimensionValues extends "Dimension Values"
             }
         }
     }
+
+    local procedure ValidateDimension(var RecDimvalue: Record "Dimension Value")
+    begin
+        if RecDimvalue.FindSet() then begin
+            repeat
+                RecDimvalue.TestField(Global, true);
+            until RecDimvalue.Next() = 0;
+        end
+    end;
 }

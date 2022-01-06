@@ -102,47 +102,98 @@ codeunit 50202 "IT GM Replicate Data"
         RecGMOutbox.Modify(true);
     end;
 
-    procedure MoveToInbox(Var RecOutbox: Record "IT GM Outbox Transactions"; MoveOnlyOnSameInstance: Boolean)
+    procedure MoveToInbox(Var RecOutboxP: Record "IT GM Outbox Transactions")
+    var
+        IsDistributionSetupAvailable: Boolean;
+        RecOutboxL: Record "IT GM Outbox Transactions";
+        CheckList: List of [Text];
+        RecDataDistSetup: Record "IT GM Data Distribution Setup";
+        MarkedOutBox: Record "IT GM Outbox Transactions";
+    begin
+        IsDistributionSetupAvailable := false;
+        Clear(CheckList);
+        Clear(RecOutboxL);
+        RecOutboxL.Copy(RecOutboxP);
+        if RecOutboxL.FindSet() then begin
+            repeat
+                Clear(RecDataDistributionSetup);
+                RecDataDistributionSetup.SetRange("Table Name", RecOutboxL."Source Type");
+                RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
+                RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Same Instance");
+                if RecDataDistributionSetup.FindSet() then begin
+                    repeat
+                        IsDistributionSetupAvailable := true;
+                        InsertIntoGMInbox(RecOutboxL, RecDataDistributionSetup."Destination Entity");
+                    until RecDataDistributionSetup.Next() = 0;
+                end;
+            until RecOutboxL.Next() = 0;
+        end;
+
+
+        Clear(RecDataDistributionSetup);
+        //RecDataDistributionSetup.SetRange("Table Name", RecOutboxP."Source Type");
+        RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
+        RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Different Instance");
+        if RecDataDistributionSetup.FindSet() then begin
+            repeat
+                if not CheckList.Contains(RecDataDistributionSetup."Destination Entity") then begin
+                    CheckList.Add(RecDataDistributionSetup."Destination Entity");
+                    Clear(MarkedOutBox);
+                    Clear(RecDataDistSetup);
+                    RecDataDistSetup.SetRange("Source Entity", CompanyName);
+                    RecDataDistSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Different Instance");
+                    RecDataDistSetup.SetRange("Destination Entity", RecDataDistributionSetup."Destination Entity");
+                    if RecDataDistSetup.FindSet() then begin
+                        repeat
+                            Clear(RecOutboxL);
+                            RecOutboxL.Copy(RecOutboxP);
+                            RecOutboxL.SetRange("Source Type", RecDataDistSetup."Table Name");
+                            if RecOutboxL.FindSet() then begin
+                                repeat
+                                    MarkedOutBox.SetCurrentKey("Entry No.");
+                                    MarkedOutBox.SetRange("Entry No.", RecOutboxL."Entry No.");
+                                    if MarkedOutBox.FindFirst() then
+                                        MarkedOutBox.Mark(true);
+                                until RecOutboxL.Next() = 0;
+                            end;
+                        until RecDataDistSetup.Next() = 0;
+                    end;
+                    MarkedOutBox.SetRange("Entry No.");
+                    MarkedOutBox.MarkedOnly(true);
+                    if MarkedOutBox.Count > 0 then begin
+                        IsDistributionSetupAvailable := true;
+                        SendDataToAzureBlobStorage(MarkedOutBox, RecDataDistributionSetup."Destination Entity");
+                    end;
+                end;
+            until RecDataDistributionSetup.Next() = 0;
+        end;
+
+
+        if not IsDistributionSetupAvailable then
+            Error('Data Distribution Setup is not available');
+
+        Clear(RecOutboxL);
+        RecOutboxL.Copy(RecOutboxP);
+        if RecOutboxL.FindSet() then begin
+            repeat
+                RecOutboxL.Status := RecOutboxL.Status::Synced;
+                RecOutboxL.Modify();
+                MoveToHandledOutbox(RecOutboxL);
+                RecOutboxL.Delete();
+            until RecOutboxL.Next() = 0;
+        end;
+    end;
+
+    local procedure MoveToHandledOutbox(Var RecOutbox: Record "IT GM Outbox Transactions")
     var
         RecHandledOutbox: Record "IT GM Outbox Handled Trans.";
         RecGLOutboxHandled: Record "IT GM Outbox Handled G/L Acc.";
         RecItemOutboxHandled: Record "IT GM Outbox Handled Items";
         RecDimensionOutboxHandled: Record "IT GM Outbox Handled Dimension";
-        DefaultDimensionsOutbox: Record "IT GM Outbox Default Dimens.";
         DefaultDimensionsHandledOutbox: Record "IT GM Outbox Handl. Def. Dimen";
-        IsDistributionSetupAvailable: Boolean;
+        DefaultDimensionsOutbox: Record "IT GM Outbox Default Dimens.";
     begin
-        IsDistributionSetupAvailable := false;
-        Clear(RecDataDistributionSetup);
-        RecDataDistributionSetup.SetRange("Table Name", RecOutbox."Source Type");
-        RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
-        RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Same Instance");
-        if RecDataDistributionSetup.FindSet() then begin
-            repeat
-                IsDistributionSetupAvailable := true;
-                InsertIntoGMInbox(RecOutbox, RecDataDistributionSetup."Destination Entity");
-            until RecDataDistributionSetup.Next() = 0;
-        end;
 
-        if not MoveOnlyOnSameInstance then begin
-            Clear(RecDataDistributionSetup);
-            RecDataDistributionSetup.SetRange("Table Name", RecOutbox."Source Type");
-            RecDataDistributionSetup.SetRange("Source Entity", CompanyName);
-            RecDataDistributionSetup.SetRange("Destination Entity Type", RecDataDistributionSetup."Destination Entity Type"::"Different Instance");
-            if RecDataDistributionSetup.FindSet() then begin
-                repeat
-                    IsDistributionSetupAvailable := true;
-                    SendDataToAzureBlobStorage(RecOutbox, RecDataDistributionSetup."Destination Entity");
-                until RecDataDistributionSetup.Next() = 0;
-            end;
-        end;
-        if (MoveOnlyOnSameInstance) AND (IsDistributionSetupAvailable = false) then
-            exit;
-        if not IsDistributionSetupAvailable then
-            Error('Data Distribution Setup is not available');
-
-        RecOutbox.Status := RecOutbox.Status::Synced;
-        RecOutbox.Modify();
         Clear(RecHandledOutbox);
         RecHandledOutbox.Init();
         RecHandledOutbox.TransferFields(RecOutbox);
@@ -221,11 +272,9 @@ codeunit 50202 "IT GM Replicate Data"
                     RecDimensionOutbox.Delete();
                 end;
         end;
-
-        RecOutbox.Delete();
     end;
 
-    local procedure InsertIntoGMInbox(RecOutbox: Record "IT GM Outbox Transactions"; EntityName: Text[30])
+    local procedure InsertIntoGMInbox(var RecOutbox: Record "IT GM Outbox Transactions"; EntityName: Text[30])
     var
         DefaultDimensionInbox: Record "IT GM Inbox Default Dimensions";
         DefaultDimensionOutbox: Record "IT GM Outbox Default Dimens.";
@@ -325,42 +374,44 @@ codeunit 50202 "IT GM Replicate Data"
     var
         ExportOutboxData: XmlPort "IT GM Outbox Export";
         TempBlob: Codeunit "Temp Blob";
-        RecCompanyInfo: Record "Company Information";
-        RecOutboxLocal: Record "IT GM Outbox Transactions";
+        RecBlobStorageSetup: Record "IT Blob Storage Account";
+        //RecOutboxLocal: Record "IT GM Outbox Transactions";
         BlobService: Codeunit "Blob Service API GM";
         FileName: Text;
         OutStream: OutStream;
         InStream: InStream;
     begin
-        Clear(RecOutboxLocal);
-        RecOutboxLocal.SetRange("Entry No.", RecOutbox."Entry No.");
-        RecOutboxLocal.FindFirst();
+        // Clear(RecOutboxLocal);
+        // RecOutboxLocal.SetRange("Entry No.", RecOutbox."Entry No.");
+        // RecOutboxLocal.FindFirst();
         Clear(ExportOutboxData);
-        ExportOutboxData.SetTableView(RecOutboxLocal);
+        //ExportOutboxData.SetTableView(RecOutboxLocal);
+        ExportOutboxData.SetTableView(RecOutbox);
         TempBlob.CreateOutStream(OutStream);
         ExportOutboxData.SetDestination(OutStream);
         ExportOutboxData.Export();
         TempBlob.CreateInStream(Instream);
-        RecCompanyInfo.GET;
-        RecCompanyInfo.TestField("Root Container GM");
-        FileName := RecOutboxLocal."Source Entity" + '_' + EntityName + '_' + FORMAT(RecOutboxLocal."Source Type") + '_' + RecOutboxLocal."Document No." + '_' + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '.xml';
-        BlobService.PutBlob(RecCompanyInfo."Root Container GM", FileName, Instream);
+        RecBlobStorageSetup.GET;
+        RecBlobStorageSetup.TestField("Root Container GM");
+        //FileName := RecOutboxLocal."Source Entity" + '_' + EntityName + '_' + FORMAT(RecOutboxLocal."Source Type") + '_' + RecOutboxLocal."Document No." + '_' + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '.xml';
+        FileName := 'From_' + CompanyName + '_To_' + EntityName + '_' + DelChr(Format(CurrentDateTime), '=', ':\/,APM-. ') + '.xml';
+        BlobService.PutBlob(RecBlobStorageSetup."Root Container GM", FileName, Instream);
     end;
 
     procedure ImportFromBlobStorage(Filename: Text)
     var
         ImportDataIntoInbox: XmlPort "IT GM Inbox Import";
-        RecCompanyInfo: Record "Company Information";
+        RecBlobStorageAccount: Record "IT Blob Storage Account";
         BlobService: Codeunit "Blob Service API GM";
         InStream: InStream;
         InStreamL: InStream;
     begin
-        RecCompanyInfo.GET;
+        RecBlobStorageAccount.GET;
         Clear(BlobService);
-        BlobService.GetBlobIntoStream(RecCompanyInfo."Root Container GM", FileName, Instream);
-        BlobService.GetBlobIntoStream(RecCompanyInfo."Root Container GM", FileName, InstreamL);
-        BlobService.PutBlob(RecCompanyInfo."Failed Container GM", FileName, InstreamL);
-        BlobService.DeleteBlob(RecCompanyInfo."Root Container GM", FileName);
+        BlobService.GetBlobIntoStream(RecBlobStorageAccount."Root Container GM", FileName, Instream);
+        BlobService.GetBlobIntoStream(RecBlobStorageAccount."Root Container GM", FileName, InstreamL);
+        BlobService.PutBlob(RecBlobStorageAccount."Failed Container GM", FileName, InstreamL);
+        BlobService.DeleteBlob(RecBlobStorageAccount."Root Container GM", FileName);
 
         Clear(ImportDataIntoInbox);
         ImportDataIntoInbox.SetSource(Instream);
@@ -368,8 +419,8 @@ codeunit 50202 "IT GM Replicate Data"
 
         //Moving from failed to success 
         Clear(BlobService);
-        BlobService.PutBlob(RecCompanyInfo."Success Container GM", FileName, Instream);
-        BlobService.DeleteBlob(RecCompanyInfo."Failed Container GM", FileName);
+        BlobService.PutBlob(RecBlobStorageAccount."Success Container GM", FileName, Instream);
+        BlobService.DeleteBlob(RecBlobStorageAccount."Failed Container GM", FileName);
 
     end;
 

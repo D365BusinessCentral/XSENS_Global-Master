@@ -39,7 +39,7 @@ table 50203 "IT GM Data Distribution Setup"
     }
     keys
     {
-        key(PK; "Source Entity", "Table Name", "Destination Entity")
+        key(PK; "Source Entity", "Table Name", "Destination Entity", "Destination Entity Type")
         {
             Clustered = true;
         }

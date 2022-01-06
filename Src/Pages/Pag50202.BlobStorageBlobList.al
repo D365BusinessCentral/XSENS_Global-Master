@@ -118,8 +118,14 @@ page 50202 "IT BlobStorage Blob List"
                 trigger OnAction()
                 var
                     blobServiceApi: Codeunit "Blob Service API GM";
+                    RecFiles: Record "IT Blob Storage Blob Lists";
                 begin
-                    if blobServiceApi.DeleteBlob(Rec.Container, Rec.Name) then begin
+                    Clear(RecFiles);
+                    CurrPage.SetSelectionFilter(RecFiles);
+                    if RecFiles.FindSet() then begin
+                        repeat
+                            blobServiceApi.DeleteBlob(RecFiles.Container, RecFiles.Name);
+                        until RecFiles.Next() = 0;
                         blobServiceApi.ListBlobs(Rec.Container);
                     end;
                 end;

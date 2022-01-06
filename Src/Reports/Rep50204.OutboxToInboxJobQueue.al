@@ -12,9 +12,9 @@ report 50204 OutboxToInbox_JobQueue
         Clear(RecOutbox);
         RecOutbox.SetFilter("Entry No.", '<>%1', 0);
         if RecOutbox.FindSet() then begin
-            repeat
-                ReplicateData.MoveToInbox(RecOutbox, true);
-            until RecOutbox.Next() = 0;
+            // repeat
+            ReplicateData.MoveToInbox(RecOutbox);
+            // until RecOutbox.Next() = 0;
         end;
     end;
 }

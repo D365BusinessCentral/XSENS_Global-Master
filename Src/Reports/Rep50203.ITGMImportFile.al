@@ -25,12 +25,12 @@ report 50203 "IT GM Import File"
                             BlobListsPage: Page "IT BlobStorage Blob List";
                             BlobService: Codeunit "Blob Service API GM";
                         begin
-                            RecCompanyInfo.GET;
-                            RecCompanyInfo.TestField("Root Container GM");
+                            RecBlobStorageAccount.GET;
+                            RecBlobStorageAccount.TestField("Root Container GM");
                             Clear(BlobService);
-                            BlobService.ListBlobs(RecCompanyInfo."Root Container GM");
+                            BlobService.ListBlobs(RecBlobStorageAccount."Root Container GM");
                             Clear(BlobLists);
-                            BlobLists.SetRange(Container, RecCompanyInfo."Root Container GM");
+                            BlobLists.SetRange(Container, RecBlobStorageAccount."Root Container GM");
                             Clear(BlobListsPage);
                             BlobListsPage.SetTableView(BlobLists);
                             BlobListsPage.LookupMode(true);
@@ -51,12 +51,12 @@ report 50203 "IT GM Import File"
             BlobService: Codeunit "Blob Service API GM";
             NoSeriesMgmt: Codeunit NoSeriesManagement;
         begin
-            RecCompanyInfo.GET;
-            RecCompanyInfo.TestField("Root Container GM");
+            RecBlobStorageAccount.GET;
+            RecBlobStorageAccount.TestField("Root Container GM");
             Clear(BlobService);
-            BlobService.ListBlobs(RecCompanyInfo."Root Container GM");
+            BlobService.ListBlobs(RecBlobStorageAccount."Root Container GM");
             Clear(BlobLists);
-            BlobLists.SetRange(Container, RecCompanyInfo."Root Container GM");
+            BlobLists.SetRange(Container, RecBlobStorageAccount."Root Container GM");
             BlobLists.FindFirst();
             FileName := BlobLists.Name;
         end;
@@ -73,7 +73,7 @@ report 50203 "IT GM Import File"
             Error('Please select a file from Blob Storage');
 
         Clear(BlobLists);
-        BlobLists.SetRange(Container, RecCompanyInfo."Root Container GM");
+        BlobLists.SetRange(Container, RecBlobStorageAccount."Root Container GM");
         BlobLists.SetRange(Name, FileName);
         if not BlobLists.FindFirst() then
             Error('Please select a file from Blob Storage List');
@@ -86,10 +86,10 @@ report 50203 "IT GM Import File"
 
     trigger OnInitReport()
     begin
-        RecCompanyInfo.GET;
+        RecBlobStorageAccount.GET;
     end;
 
     var
         FileName: Text;
-        RecCompanyInfo: Record "Company Information";
+        RecBlobStorageAccount: Record "IT Blob Storage Account";
 }
